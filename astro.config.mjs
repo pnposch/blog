@@ -4,11 +4,13 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import siteConfig from './src/data/site-config';
 
+import image from '@astrojs/image';
+
 // https://astro.build/config
 export default defineConfig({
     site: siteConfig.website,
     vite: {
         plugins: [tailwindcss()]
     },
-    integrations: [mdx(), sitemap()]
+    integrations: [mdx(), sitemap(), image()]
 });
