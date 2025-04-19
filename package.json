@@ -1,5 +1,7 @@
 {
-    "name": "dante-astro-theme",
+    "name": "pnp-astro",
+    "private": true,
+    "description": "A simple Astro blog template with Tailwind CSS and MDX support.",
     "type": "module",
     "version": "0.2.0",
     "scripts": {
