@@ -1,22 +1,12 @@
 # my blog
 
-### Start the Development Server
+Simply my blog where i keep stuff
+
+## Start the Development Server
 
 ```sh
 npm i -g pnpm
-pnpm install
-pnpm dev
 ```
-
-### Production Build & Run
-
-```sh
-sudo docker build . --build-arg SITE_URL=https://example.com --build-arg DIRECTUS_URL=https://example.directus.com -t astro-deploy
-docker run -d -p 1234:80 astro-deploy
-```
-
-## 🧞 Commands
-
 All commands are run from the root of the project, from a terminal:
 
 | Command                    | Action                                           |
@@ -31,6 +21,20 @@ All commands are run from the root of the project, from a terminal:
 | `pnpm run format`          | Formats codebase using Prettier                  |
 | `pnpm run commit`          | Commits changes to version control               |
 
+## Production Build & Run
+
+```sh
+sudo docker build . --build-arg SITE_URL=https://example.com --build-arg DIRECTUS_URL=https://example.directus.com -t astro-deploy
+docker run -d -p 1234:80 astro-deploy
+```
+## GitHub Pages Deployment
+1. Set `site` and `base` in astro.config.mjs
+2. Create repository `<username>.github.io`
+3. Push code to main branch
+4. Enable GitHub Pages in repo settings
+
+[![Deploy Astro site to Pages](https://github.com/pnposch/blog/actions/workflows/astro.yml/badge.svg)](https://github.com/pnposch/blog/actions/workflows/astro.yml)
+
 ## License
-[based on](https://app.netlify.com/start/deploy?repository=https://github.com/JustGoodUI/dante-astro-theme)
+[based on dante-astro-theme](https://github.com/JustGoodUI/dante-astro-theme)
 Licensed under the [GPL-3.0](https://github.com/JustGoodUI/dante-astro-theme/blob/main/LICENSE) license.
