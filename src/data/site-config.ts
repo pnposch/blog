@@ -84,7 +84,7 @@ const siteConfig: SiteConfig = {
     socialLinks: [
         {
             text: 'LinkedIn',
-            href: 'https://www.linkedin.com/pnposch'
+            href: 'https://www.linkedin.com/in/pnposch'
         },
 
     ],
