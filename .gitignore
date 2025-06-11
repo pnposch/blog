@@ -19,3 +19,13 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# symbolic links
+*.symlink
+
+
+# temporary files
+*.tmp
+*.temp
+# IDE specific files
+src/content/public
