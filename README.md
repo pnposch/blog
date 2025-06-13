@@ -1,8 +1,7 @@
 [![Deploy Astro site to Pages](https://github.com/pnposch/blog/actions/workflows/astro.yml/badge.svg)](https://github.com/pnposch/blog/actions/workflows/astro.yml)
 
 # My Blog Repo
-Simply my blog where i keep stuff, actually this is part 1 of the repo, the actual stuff is linked.
-I use github pages to build this repo and deploy the website and use github actions on the linked repo to push changes to here.
+Simply my blog where i keep stuff, actually this is part 1 of the repo, the actual stuff is linked via the github action.
 
 If you plan to use this for your own setup, ensure appropriate changes to the workflow.
 

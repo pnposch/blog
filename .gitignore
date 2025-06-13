@@ -29,3 +29,4 @@ pnpm-debug.log*
 *.temp
 # IDE specific files
 src/content/public
+!/src/content/

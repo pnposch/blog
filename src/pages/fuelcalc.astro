@@ -1,0 +1,340 @@
+---
+// src/pages/fuelcalc.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Electric vs Gas Cost Calculator">
+  <main>
+    <h1>Electric vs Gas Cost Comparison</h1>
+
+    <div class="calculator-container">
+      <div class="input-section">
+        <label for="kwh-price">Electricity Price (cts per kWh):</label>
+        <input type="number" id="kwh-price"  value="0.35">
+
+        <label for="fuel-price">Fuel Price (per l):</label>
+        <input type="number" id="fuel-price"  value="1.2">
+
+        <label for="electric-consumption">Electric Consumption (kWh/100km):</label>
+        <input type="number" id="electric-consumption"  value="25">
+
+        <label for="fuel-consumption">Fuel Consumption (L/100km):</label>
+        <input type="number" id="fuel-consumption" value="7">
+
+        <button id="calculate-btn">Calculate</button>
+      </div>
+
+        <div class="button-group">
+          <button id="calculate-cost-btn" class="btn-primary">Calculate Cost Comparison</button>
+          <button id="calculate-breakeven-btn" class="btn-secondary">Generate Breakeven Analysis</button>
+        </div>
+      </div>
+
+      <div class="charts-container" align="center">
+        <div class="chart-wrapper">
+          <h3>Cost Comparison by Distance</h3>
+          <canvas id="costChart"></canvas>
+        </div>
+        <br/>
+        <div class="chart-wrapper">
+          <h3>Breakeven Analysis: Electric vs Gas Prices</h3>
+          <canvas id="breakevenChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
+
+  let costChart = null;
+  let breakevenChart = null;
+
+  function calculateCostComparison() {
+    const kwhPrice = parseFloat(document.getElementById('kwh-price').value);
+    const fuelPrice = parseFloat(document.getElementById('fuel-price').value);
+    const electricConsumption = parseFloat(document.getElementById('electric-consumption').value);
+    const fuelConsumption = parseFloat(document.getElementById('fuel-consumption').value);
+
+    if (!kwhPrice || !fuelPrice || !electricConsumption || !fuelConsumption) {
+      alert('Please fill in all fields for cost comparison');
+      return;
+    }
+
+    // Calculate costs per 100km
+    const electricCost = (electricConsumption * kwhPrice);
+    const fuelCost = (fuelConsumption * fuelPrice);
+
+    // Create chart data for different distances
+    const distances = [5, 10, 50, 100, 200, 500, 1000];
+    const electricCosts = distances.map(d => (d/100) * electricCost);
+    const fuelCosts = distances.map(d => (d/100) * fuelCost);
+
+    const ctx = document.getElementById('costChart').getContext('2d');
+
+    // Destroy existing chart if it exists
+    if (costChart) {
+      costChart.destroy();
+    }
+
+    costChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: distances.map(d => d + ' km'),
+        datasets: [{
+          label: 'Electric Cost (€)',
+          data: electricCosts,
+          borderColor: 'rgb(34, 197, 94)',
+          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          tension: 0.1
+        }, {
+          label: 'Fuel Cost (€)',
+          data: fuelCosts,
+          borderColor: 'rgb(239, 68, 68)',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: `Electric: ${electricCost.toFixed(2)}€/100km vs Fuel: ${fuelCost.toFixed(2)}€/100km`
+
+          },
+          legend: {
+            display: true,
+            position: 'top',
+            color: 'var(--text-primary, #1f2937)'
+
+
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Cost (€)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Distance'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function calculateBreakevenAnalysis() {
+    const electricConsumption = parseFloat(document.getElementById('electric-consumption').value);
+    const fuelConsumption = parseFloat(document.getElementById('fuel-consumption').value);
+
+    if (!electricConsumption || !fuelConsumption) {
+      alert('Please fill in consumption values for breakeven analysis');
+      return;
+    }
+
+    // Create price ranges
+    const fuelPrices = [];
+    const electricPrices = [];
+    const breakevenData = [];
+
+    // Generate fuel price range (per liter)
+    for (let fuelPrice = 1.2; fuelPrice <= 3.0; fuelPrice += 0.1) {
+      fuelPrices.push(fuelPrice);
+    }
+
+    // Generate electric price range (per kWh)
+    for (let electricPrice = 0.10; electricPrice <= 1.0; electricPrice += 0.01) {
+      electricPrices.push(electricPrice);
+    }
+
+    // Calculate breakeven line
+    const breakevenLine = fuelPrices.map(fuelPrice => {
+      // At breakeven: electricConsumption * electricPrice = fuelConsumption * fuelPrice
+      // Therefore: electricPrice = (fuelConsumption * fuelPrice) / electricConsumption
+      return (fuelConsumption * fuelPrice) / electricConsumption;
+    });
+
+    const ctx = document.getElementById('breakevenChart').getContext('2d');
+
+    // Destroy existing chart if it exists
+    if (breakevenChart) {
+      breakevenChart.destroy();
+    }
+
+    breakevenChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: fuelPrices.map(p => p.toFixed(1)),
+        datasets: [{
+          label: 'Breakeven Electric Price',
+          data: breakevenLine,
+          borderColor: 'rgb(147, 51, 234)',
+          backgroundColor: 'rgba(147, 51, 234, 0.1)',
+          tension: 0.1,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Electric cheaper below line, Gas cheaper above line'
+          },
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 1.2,
+            title: {
+              display: true,
+              text: 'Electricity Price (€/kWh)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Fuel Price (€/liter)'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Add event listeners
+  document.getElementById('calculate-cost-btn').addEventListener('click', calculateCostComparison);
+  document.getElementById('calculate-breakeven-btn').addEventListener('click', calculateBreakevenAnalysis);
+</script>
+
+<style>
+  .calculator-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+.input-section {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  background: var(--bg-secondary, transparent);
+}
+
+  .input-section h3 {
+    margin: 1rem 0 0.5rem 0;
+    color: var(--text-primary, #1f2937);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    padding-bottom: 0.5rem;
+  }
+
+  .input-section h3:first-child {
+    margin-top: 0;
+  }
+
+  .input-section label {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+    color: var(--text-primary, #374151);
+  }
+
+  .input-field {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 4px;
+    font-size: 1rem;
+    background: var(--bg-primary, #ffffff);
+    color: var(--text-primary, #1f2937);
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--accent-color, #3b82f6);
+    box-shadow: 0 0 0 2px var(--accent-color-light, rgba(59, 130, 246, 0.1));
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+  }
+
+  .btn-primary {
+    background: var(--accent-color, #3b82f6);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-color-dark, #2563eb);
+  }
+
+  .btn-secondary {
+    background: var(--bg-tertiary, #6b7280);
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: var(--text-secondary, #4b5563);
+  }
+
+  .charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .chart-wrapper {
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 1rem;
+    background: var(--bg-primary, #ffffff);
+  }
+
+  .chart-wrapper h3 {
+    margin: 0 0 1rem 0;
+    text-align: center;
+    color: var(--text-primary, #1f2937);
+  }
+
+  .chart-wrapper canvas {
+    height: 300px !important;
+  }
+
+  @media (max-width: 768px) {
+    .charts-container {
+      grid-template-columns: 1fr;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+  }
+</style>
