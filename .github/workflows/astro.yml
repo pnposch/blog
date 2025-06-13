@@ -43,7 +43,7 @@ jobs:
       - name: Checkout Content Repo
         uses: actions/checkout@v4
         with:
-          repository: pnposch/2bcon # Replace with your repo's path
+          repository: pnposch/blogcontent # Replace with your repo's path
           path: src/content # This is the directory where the repo will be cloned
           ssh-key: ${{ secrets.READ_KEY }}
       - name: Detect package manager
