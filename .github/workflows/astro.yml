@@ -9,6 +9,9 @@ on:
   push:
     branches: ["main"]
 
+  repository_dispatch:
+    types: [update-content-submodule]
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -36,7 +39,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive # Add this line
+          submodules: recursive # Add this line if content linked via submodule
+      - name: Checkout Content Repo
+        uses: actions/checkout@v4
+        with:
+          repository: pnposch/2bcon # Replace with your repo's path
+          path: src/content # This is the directory where the repo will be cloned
+          ssh-key: ${{ secrets.READ_KEY }}
       - name: Detect package manager
         id: detect-package-manager
         run: |
